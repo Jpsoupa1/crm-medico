@@ -1,0 +1,88 @@
+<!-- templates/pacientes/dashboard.html -->
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - CRM Médico{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1><i class="bi bi-grid-fill"></i> Meus Pacientes</h1>
+        <p class="text-muted">Gerencie todos os seus pacientes em um só lugar</p>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{% url 'paciente_criar' %}" class="btn btn-primary btn-lg">
+            <i class="bi bi-person-plus-fill"></i> Novo Paciente
+        </a>
+    </div>
+</div>
+
+<!-- Estatísticas -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-people-fill"></i> Total de Pacientes</h5>
+                <h2 class="mb-0">{{ total_pacientes }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Busca -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <form method="get" class="input-group">
+            <input type="text" name="busca" class="form-control" placeholder="Buscar por nome, CPF ou telefone..." value="{{ busca }}">
+            <button class="btn btn-primary" type="submit">
+                <i class="bi bi-search"></i> Buscar
+            </button>
+            {% if busca %}
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                <i class="bi bi-x-circle"></i> Limpar
+            </a>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<!-- Lista de Pacientes -->
+<div class="row">
+    {% if pacientes %}
+        {% for paciente in pacientes %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-person-fill text-primary"></i> {{ paciente.nome_completo }}
+                    </h5>
+                    <p class="card-text">
+                        <strong><i class="bi bi-calendar-event"></i> Idade:</strong> {{ paciente.get_idade }} anos<br>
+                        <strong><i class="bi bi-telephone-fill"></i> Telefone:</strong> {{ paciente.telefone }}<br>
+                        <strong><i class="bi bi-geo-alt-fill"></i> Cidade:</strong> {{ paciente.cidade }}, {{ paciente.estado }}
+                    </p>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'paciente_detalhes' paciente.pk %}" class="btn btn-primary btn-sm">
+                            <i class="bi bi-eye-fill"></i> Ver Detalhes
+                        </a>
+                    </div>
+                </div>
+                <div class="card-footer text-muted">
+                    <small><i class="bi bi-clock"></i> Cadastrado em {{ paciente.data_cadastro|date:"d/m/Y" }}</small>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                <i class="bi bi-info-circle-fill"></i> 
+                {% if busca %}
+                    Nenhum paciente encontrado com o termo "{{ busca }}".
+                {% else %}
+                    Você ainda não cadastrou nenhum paciente. Clique em "Novo Paciente" para começar!
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

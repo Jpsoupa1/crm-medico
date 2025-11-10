@@ -1,0 +1,53 @@
+<!-- templates/autenticacao/registro.html -->
+{% extends 'base.html' %}
+
+{% block title %}Registro - CRM Médico{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <i class="bi bi-person-plus-fill text-primary" style="font-size: 3rem;"></i>
+                    <h2 class="mt-3">Criar Conta</h2>
+                    <p class="text-muted">Registre-se para começar a usar o sistema</p>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% for field in form %}
+                    <div class="mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <small class="form-text text-muted">{{ field.help_text|safe }}</small>
+                        {% endif %}
+                        {% if field.errors %}
+                            <div class="text-danger mt-1">{{ field.errors }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    
+                    <button type="submit" class="btn btn-primary w-100 mb-3">
+                        <i class="bi bi-person-check-fill"></i> Criar Conta
+                    </button>
+                    
+                    <div class="text-center">
+                        <p class="mb-0">Já tem uma conta? <a href="{% url 'login' %}">Faça login</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-control {
+        border-radius: 0.375rem;
+    }
+</style>
+{% endblock %}

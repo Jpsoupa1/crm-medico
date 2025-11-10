@@ -1,0 +1,214 @@
+<!-- templates/pacientes/paciente_detalhes.html -->
+{% extends 'base.html' %}
+
+{% block title %}{{ paciente.nome_completo }} - CRM Médico{% endblock %}
+
+{% block content %}
+<!-- Cabeçalho -->
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1><i class="bi bi-person-circle"></i> {{ paciente.nome_completo }}</h1>
+        <p class="text-muted">Cadastrado em {{ paciente.data_cadastro|date:"d/m/Y às H:i" }}</p>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{% url 'paciente_editar' paciente.pk %}" class="btn btn-warning">
+            <i class="bi bi-pencil-fill"></i> Editar
+        </a>
+        <a href="{% url 'paciente_deletar' paciente.pk %}" class="btn btn-danger">
+            <i class="bi bi-trash-fill"></i> Excluir
+        </a>
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
+</div>
+
+<!-- Informações Básicas -->
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-person-badge"></i> Informações Básicas</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <strong><i class="bi bi-calendar-event"></i> Data de Nascimento:</strong><br>
+                        {{ paciente.data_nascimento|date:"d/m/Y" }} ({{ paciente.get_idade }} anos)
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong><i class="bi bi-gender-ambiguous"></i> Sexo:</strong><br>
+                        {{ paciente.get_sexo_display }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <strong><i class="bi bi-card-text"></i> CPF:</strong><br>
+                        {{ paciente.cpf }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong><i class="bi bi-droplet-fill"></i> Tipo Sanguíneo:</strong><br>
+                        {{ paciente.tipo_sanguineo|default:"Não informado" }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-telephone-fill"></i> Contato</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-2">
+                    <strong><i class="bi bi-telephone"></i> Telefone:</strong><br>
+                    {{ paciente.telefone }}
+                </p>
+                <p class="mb-0">
+                    <strong><i class="bi bi-envelope"></i> E-mail:</strong><br>
+                    {{ paciente.email|default:"Não informado" }}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Endereço -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-geo-alt-fill"></i> Endereço</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-0">
+                    {{ paciente.endereco }}<br>
+                    {{ paciente.cidade }} - {{ paciente.estado }}<br>
+                    CEP: {{ paciente.cep }}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Informações Médicas -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="bi bi-heart-pulse"></i> Informações Médicas</h5>
+            </div>
+            <div class="card-body">
+                {% if paciente.alergias %}
+                <div class="mb-3">
+                    <strong><i class="bi bi-exclamation-triangle-fill text-danger"></i> Alergias:</strong>
+                    <p class="ms-3">{{ paciente.alergias }}</p>
+                </div>
+                {% endif %}
+                
+                {% if paciente.medicamentos_uso %}
+                <div class="mb-3">
+                    <strong><i class="bi bi-capsule"></i> Medicamentos em Uso:</strong>
+                    <p class="ms-3">{{ paciente.medicamentos_uso }}</p>
+                </div>
+                {% endif %}
+                
+                {% if paciente.historico_familiar %}
+                <div class="mb-3">
+                    <strong><i class="bi bi-people-fill"></i> Histórico Familiar:</strong>
+                    <p class="ms-3">{{ paciente.historico_familiar }}</p>
+                </div>
+                {% endif %}
+                
+                {% if paciente.observacoes %}
+                <div class="mb-0">
+                    <strong><i class="bi bi-journal-text"></i> Observações:</strong>
+                    <p class="ms-3">{{ paciente.observacoes }}</p>
+                </div>
+                {% endif %}
+                
+                {% if not paciente.alergias and not paciente.medicamentos_uso and not paciente.historico_familiar and not paciente.observacoes %}
+                <p class="text-muted mb-0">Nenhuma informação médica adicional cadastrada.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Documentos -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-file-earmark-pdf-fill"></i> Documentos PDF</h5>
+                <a href="{% url 'documento_adicionar' paciente.pk %}" class="btn btn-light btn-sm">
+                    <i class="bi bi-plus-circle"></i> Adicionar PDF
+                </a>
+            </div>
+            <div class="card-body">
+                {% if documentos %}
+                <div class="list-group">
+                    {% for documento in documentos %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1"><i class="bi bi-file-pdf"></i> {{ documento.titulo }}</h6>
+                            <p class="mb-1 text-muted small">{{ documento.descricao|default:"Sem descrição" }}</p>
+                            <small class="text-muted">Enviado em {{ documento.data_upload|date:"d/m/Y às H:i" }}</small>
+                        </div>
+                        <div>
+                            <a href="{{ documento.arquivo.url }}" target="_blank" class="btn btn-sm btn-primary me-2">
+                                <i class="bi bi-download"></i> Baixar
+                            </a>
+                            <a href="{% url 'documento_deletar' documento.pk %}" class="btn btn-sm btn-danger">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">Nenhum documento cadastrado.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Fotos -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-image-fill"></i> Fotos</h5>
+                <a href="{% url 'foto_adicionar' paciente.pk %}" class="btn btn-light btn-sm">
+                    <i class="bi bi-plus-circle"></i> Adicionar Foto
+                </a>
+            </div>
+            <div class="card-body">
+                {% if fotos %}
+                <div class="row">
+                    {% for foto in fotos %}
+                    <div class="col-md-3 mb-3">
+                        <div class="card">
+                            <img src="{{ foto.imagem.url }}" class="card-img-top" alt="{{ foto.titulo }}" style="height: 200px; object-fit: cover;">
+                            <div class="card-body">
+                                <h6 class="card-title">{{ foto.titulo }}</h6>
+                                <p class="card-text small text-muted">{{ foto.descricao|default:"Sem descrição" }}</p>
+                                <small class="text-muted d-block mb-2">{{ foto.data_upload|date:"d/m/Y" }}</small>
+                                <a href="{% url 'foto_deletar' foto.pk %}" class="btn btn-sm btn-danger w-100">
+                                    <i class="bi bi-trash"></i> Remover
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">Nenhuma foto cadastrada.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

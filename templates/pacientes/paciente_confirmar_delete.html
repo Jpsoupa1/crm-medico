@@ -1,0 +1,36 @@
+<!-- templates/pacientes/paciente_confirmar_delete.html -->
+{% extends 'base.html' %}
+
+{% block title %}Confirmar Exclusão - CRM Médico{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0"><i class="bi bi-exclamation-triangle-fill"></i> Confirmar Exclusão</h4>
+            </div>
+            <div class="card-body">
+                <p class="mb-4">Tem certeza que deseja excluir o paciente <strong>{{ paciente.nome_completo }}</strong>?</p>
+                
+                <div class="alert alert-warning">
+                    <i class="bi bi-info-circle-fill"></i> 
+                    <strong>Atenção:</strong> Esta ação não pode ser desfeita. Todos os documentos e fotos relacionados também serão excluídos.
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'paciente_detalhes' paciente.pk %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash-fill"></i> Sim, Excluir Paciente
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
