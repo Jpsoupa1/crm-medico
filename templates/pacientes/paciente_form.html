@@ -1,4 +1,3 @@
-<!-- templates/pacientes/paciente_form.html -->
 {% extends 'base.html' %}
 
 {% block title %}{{ titulo }} - CRM Médico{% endblock %}
@@ -23,6 +22,7 @@
                             {% if form.nome_completo.errors %}
                                 <div class="text-danger">{{ form.nome_completo.errors }}</div>
                             {% endif %}
+                            <small class="form-text text-muted">Apenas letras</small>
                         </div>
                         <div class="col-md-3 mb-3">
                             <label for="{{ form.data_nascimento.id_for_label }}" class="form-label">Data de Nascimento *</label>
@@ -47,6 +47,7 @@
                             {% if form.cpf.errors %}
                                 <div class="text-danger">{{ form.cpf.errors }}</div>
                             {% endif %}
+                            <small class="form-text text-muted">Apenas números - formatação automática</small>
                         </div>
                         <div class="col-md-3 mb-3">
                             <label for="{{ form.telefone.id_for_label }}" class="form-label">Telefone *</label>
@@ -54,6 +55,7 @@
                             {% if form.telefone.errors %}
                                 <div class="text-danger">{{ form.telefone.errors }}</div>
                             {% endif %}
+                            <small class="form-text text-muted">11 dígitos com DDD</small>
                         </div>
                         <div class="col-md-3 mb-3">
                             <label for="{{ form.email.id_for_label }}" class="form-label">E-mail</label>
@@ -67,13 +69,28 @@
                     <!-- Endereço -->
                     <h5 class="border-bottom pb-2 mb-3 mt-4"><i class="bi bi-geo-alt-fill"></i> Endereço</h5>
                     <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.cep.id_for_label }}" class="form-label">CEP *</label>
+                            <div class="input-group">
+                                {{ form.cep }}
+                                <button type="button" id="btn-buscar-cep" class="btn btn-outline-primary">
+                                    <i class="bi bi-search"></i> Buscar
+                                </button>
+                            </div>
+                            {% if form.cep.errors %}
+                                <div class="text-danger">{{ form.cep.errors }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">Digite o CEP e clique em Buscar</small>
+                            <div id="cep-loading" class="text-primary mt-1" style="display:none;">
+                                <i class="bi bi-hourglass-split"></i> Buscando...
+                            </div>
+                        </div>
                         <div class="col-md-8 mb-3">
                             <label for="{{ form.endereco.id_for_label }}" class="form-label">Endereço *</label>
                             {{ form.endereco }}
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label for="{{ form.cep.id_for_label }}" class="form-label">CEP *</label>
-                            {{ form.cep }}
+                            {% if form.endereco.errors %}
+                                <div class="text-danger">{{ form.endereco.errors }}</div>
+                            {% endif %}
                         </div>
                     </div>
                     
@@ -81,10 +98,16 @@
                         <div class="col-md-8 mb-3">
                             <label for="{{ form.cidade.id_for_label }}" class="form-label">Cidade *</label>
                             {{ form.cidade }}
+                            {% if form.cidade.errors %}
+                                <div class="text-danger">{{ form.cidade.errors }}</div>
+                            {% endif %}
                         </div>
                         <div class="col-md-4 mb-3">
                             <label for="{{ form.estado.id_for_label }}" class="form-label">Estado *</label>
                             {{ form.estado }}
+                            {% if form.estado.errors %}
+                                <div class="text-danger">{{ form.estado.errors }}</div>
+                            {% endif %}
                         </div>
                     </div>
                     
@@ -144,4 +167,121 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // ========== MÁSCARA CPF ==========
+    const cpfInput = document.getElementById('id_cpf');
+    if (cpfInput) {
+        cpfInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            
+            if (value.length <= 11) {
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+                e.target.value = value;
+            }
+        });
+    }
+    
+    // ========== MÁSCARA TELEFONE ==========
+    const telefoneInput = document.getElementById('id_telefone');
+    if (telefoneInput) {
+        telefoneInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            
+            if (value.length <= 11) {
+                value = value.replace(/^(\d{2})(\d)/g, '($1) $2');
+                value = value.replace(/(\d)(\d{4})$/, '$1-$2');
+                e.target.value = value;
+            }
+        });
+    }
+    
+    // ========== MÁSCARA CEP ==========
+    const cepInput = document.getElementById('id_cep');
+    if (cepInput) {
+        cepInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            
+            if (value.length <= 8) {
+                value = value.replace(/^(\d{5})(\d)/, '$1-$2');
+                e.target.value = value;
+            }
+        });
+    }
+    
+    // ========== APENAS LETRAS NO NOME ==========
+    const nomeInput = document.getElementById('id_nome_completo');
+    if (nomeInput) {
+        nomeInput.addEventListener('input', function(e) {
+            // Remove números e caracteres especiais, mantém letras e espaços
+            e.target.value = e.target.value.replace(/[^A-Za-zÀ-ÿ\s]/g, '');
+        });
+    }
+    
+    // ========== BUSCAR CEP (API ViaCEP) ==========
+    const btnBuscarCep = document.getElementById('btn-buscar-cep');
+    const cepLoading = document.getElementById('cep-loading');
+    const enderecoInput = document.getElementById('id_endereco');
+    const cidadeInput = document.getElementById('id_cidade');
+    const estadoInput = document.getElementById('id_estado');
+    
+    if (btnBuscarCep) {
+        btnBuscarCep.addEventListener('click', async function() {
+            const cep = cepInput.value.replace(/\D/g, '');
+            
+            if (cep.length !== 8) {
+                alert('Por favor, digite um CEP válido com 8 dígitos.');
+                return;
+            }
+            
+            // Mostrar loading
+            cepLoading.style.display = 'block';
+            btnBuscarCep.disabled = true;
+            
+            try {
+                const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                const data = await response.json();
+                
+                if (data.erro) {
+                    alert('CEP não encontrado. Por favor, verifique o número digitado.');
+                } else {
+                    // Preencher campos
+                    enderecoInput.value = data.logradouro || '';
+                    cidadeInput.value = data.localidade || '';
+                    estadoInput.value = data.uf || '';
+                    
+                    // Remover readonly se preenchido
+                    enderecoInput.removeAttribute('readonly');
+                    cidadeInput.removeAttribute('readonly');
+                    estadoInput.removeAttribute('readonly');
+                    
+                    // Focar no campo de número (se houver)
+                    enderecoInput.focus();
+                }
+            } catch (error) {
+                alert('Erro ao buscar CEP. Verifique sua conexão com a internet.');
+                console.error('Erro:', error);
+            } finally {
+                // Esconder loading
+                cepLoading.style.display = 'none';
+                btnBuscarCep.disabled = false;
+            }
+        });
+        
+        // Buscar automaticamente ao pressionar Enter no campo CEP
+        cepInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                btnBuscarCep.click();
+            }
+        });
+    }
+});
+</script>
 {% endblock %}
