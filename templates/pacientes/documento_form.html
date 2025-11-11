@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
-{% block title %}Adicionar Documento - CRM Médico{% endblock %}
+{% block title %}Adicionar Documento - CRM Légère{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="card">
-            <div class="card-header bg-danger text-white">
+            <div class="card-header card-header-tertiary">
                 <h4 class="mb-0"><i class="bi bi-file-earmark-pdf-fill"></i> Adicionar Documento PDF</h4>
             </div>
             <div class="card-body">
@@ -44,7 +44,7 @@
                         <a href="{% url 'paciente_detalhes' paciente.pk %}" class="btn btn-secondary">
                             <i class="bi bi-arrow-left"></i> Cancelar
                         </a>
-                        <button type="submit" class="btn btn-danger">
+                        <button type="submit" class="btn btn-primary">
                             <i class="bi bi-upload"></i> Enviar Documento
                         </button>
                     </div>
