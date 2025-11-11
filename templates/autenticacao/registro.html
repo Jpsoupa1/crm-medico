@@ -1,15 +1,15 @@
-<!-- templates/autenticacao/registro.html -->
 {% extends 'base.html' %}
 
-{% block title %}Registro - CRM Médico{% endblock %}
+{% block title %}Registro - CRM Légère{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center mt-5">
     <div class="col-md-6">
         <div class="card">
             <div class="card-body p-5">
-                <div class="text-center mb-4">
-                    <i class="bi bi-person-plus-fill text-primary" style="font-size: 3rem;"></i>
+                <div class="text-center mb-4 login-header">
+                    {% load static %}
+                    <img src="{% static 'assets/img/logo_escuro.png' %}" alt="Logo Légère" style="height: 100px; margin-bottom: 10px;">
                     <h2 class="mt-3">Criar Conta</h2>
                     <p class="text-muted">Registre-se para começar a usar o sistema</p>
                 </div>
@@ -45,9 +45,4 @@
 {% endblock %}
 
 {% block extra_css %}
-<style>
-    .form-control {
-        border-radius: 0.375rem;
-    }
-</style>
 {% endblock %}
