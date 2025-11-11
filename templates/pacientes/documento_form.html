@@ -1,4 +1,3 @@
-<!-- templates/pacientes/documento_form.html -->
 {% extends 'base.html' %}
 
 {% block title %}Adicionar Documento - CRM Médico{% endblock %}
@@ -35,7 +34,7 @@
                     <div class="mb-3">
                         <label for="{{ form.arquivo.id_for_label }}" class="form-label">Arquivo PDF *</label>
                         {{ form.arquivo }}
-                        <small class="form-text text-muted">Apenas arquivos PDF são permitidos.</small>
+                        <small class="form-text text-muted d-block">Apenas arquivos PDF são permitidos.</small>
                         {% if form.arquivo.errors %}
                             <div class="text-danger">{{ form.arquivo.errors }}</div>
                         {% endif %}
