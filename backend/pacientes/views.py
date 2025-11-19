@@ -4,7 +4,8 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib import messages
-from django.db.models import Q
+from django.db.models import Q, Value, F
+from django.db.models.functions import Replace
 from .models import Paciente, Documento, Foto
 from .forms import PacienteForm, DocumentoForm, FotoForm
 
@@ -71,11 +72,40 @@ def dashboard_view(request):
     pacientes = Paciente.objects.filter(medico=request.user, ativo=True)
     
     if busca:
-        pacientes = pacientes.filter(
-            Q(nome_completo__icontains=busca) |
-            Q(cpf__icontains=busca) |
-            Q(telefone__icontains=busca)
-        )
+        # Remove caracteres não numéricos da busca para comparação limpa
+        busca_limpa = ''.join(filter(str.isdigit, busca))
+        
+        filters = Q(nome_completo__icontains=busca)
+        
+        if busca_limpa:
+            # Anota os campos limpos para comparação
+            # CPF: remove . e -
+            # Telefone: remove (, ), - e espaço
+            pacientes = pacientes.annotate(
+                cpf_limpo=Replace(
+                    Replace(F('cpf'), Value('.'), Value('')), 
+                    Value('-'), Value('')
+                ),
+                telefone_limpo=Replace(
+                    Replace(
+                        Replace(
+                            Replace(F('telefone'), Value('('), Value('')), 
+                            Value(')'), Value('')
+                        ), 
+                        Value('-'), Value('')
+                    ), 
+                    Value(' '), Value('')
+                )
+            )
+            
+            filters |= Q(cpf_limpo__icontains=busca_limpa)
+            filters |= Q(telefone_limpo__icontains=busca_limpa)
+        
+        # Mantém a busca original também, para garantir
+        filters |= Q(cpf__icontains=busca)
+        filters |= Q(telefone__icontains=busca)
+        
+        pacientes = pacientes.filter(filters)
     
     pacientes = pacientes.order_by('-data_cadastro')
     
