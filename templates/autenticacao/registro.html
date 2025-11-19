@@ -1,48 +1,81 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Registro - CRM Légère{% endblock %}
+{% block title %}Criar Conta - CRM Légère{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Override main container for login page to allow full screen background */
+    main.container {
+        max-width: 100%;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Ensure footer stays at bottom but doesn't interfere with full height login */
+    body {
+        overflow-x: hidden;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-body p-5">
-                <div class="text-center mb-4 login-header">
-                    {% load static %}
-                    <img src="{% static 'assets/img/logo_escuro.png' %}" alt="Logo Légère" style="height: 100px; margin-bottom: 10px;">
-                    <h2 class="mt-3">Criar Conta</h2>
-                    <p class="text-muted">Registre-se para começar a usar o sistema</p>
+<div class="login-page-bg">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="login-card text-center">
+                    <div class="login-header">
+                        <img src="{% static 'img/logo_escuro.png' %}" alt="Logo Légère"
+                            style="height: 80px; margin-bottom: 1rem;">
+                        <h2>Criar Conta</h2>
+                        <p>Junte-se ao CRM Légère</p>
+                    </div>
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger shake mb-4">
+                            {% for error in form.non_field_errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        {% for field in form %}
+                        <div class="form-floating mb-3 text-start">
+                            <input type="{{ field.field.widget.input_type|default:'text' }}" name="{{ field.name }}"
+                                class="form-control {% if field.errors %}is-invalid{% endif %}"
+                                id="{{ field.id_for_label }}" placeholder="{{ field.label }}"
+                                value="{{ field.value|default_if_none:'' }}" {% if field.field.required %}required{%
+                                endif %}>
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+
+                            {% if field.help_text %}
+                            <small class="form-text text-muted ps-2">{{ field.help_text|safe }}</small>
+                            {% endif %}
+
+                            {% if field.errors %}
+                            <div class="invalid-feedback ps-2">
+                                {{ field.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+
+                        <button type="submit" class="btn btn-primary w-100 py-3 mb-4 fw-bold shadow-sm">
+                            <i class="bi bi-person-check-fill me-2"></i> Criar Conta
+                        </button>
+
+                        <div class="text-center">
+                            <p class="mb-0 text-muted">Já tem uma conta? <a href="{% url 'login' %}"
+                                    class="login-link">Faça login</a></p>
+                        </div>
+                    </form>
                 </div>
-                
-                <form method="post">
-                    {% csrf_token %}
-                    
-                    {% for field in form %}
-                    <div class="mb-3">
-                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                        {{ field }}
-                        {% if field.help_text %}
-                            <small class="form-text text-muted">{{ field.help_text|safe }}</small>
-                        {% endif %}
-                        {% if field.errors %}
-                            <div class="text-danger mt-1">{{ field.errors }}</div>
-                        {% endif %}
-                    </div>
-                    {% endfor %}
-                    
-                    <button type="submit" class="btn btn-primary w-100 mb-3">
-                        <i class="bi bi-person-check-fill"></i> Criar Conta
-                    </button>
-                    
-                    <div class="text-center">
-                        <p class="mb-0">Já tem uma conta? <a href="{% url 'login' %}">Faça login</a></p>
-                    </div>
-                </form>
             </div>
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_css %}
 {% endblock %}

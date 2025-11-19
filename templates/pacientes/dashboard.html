@@ -3,71 +3,153 @@
 {% block title %}Dashboard - CRM Légère{% endblock %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col-md-8">
-        <h1><i class="bi bi-grid-fill"></i> Pacientes </h1>
-        <p class="text-muted">Gerencie todos os seus pacientes em um só lugar</p>
-    </div>
-    <div class="col-md-4 text-end">
-        <a href="{% url 'paciente_criar' %}" class="btn btn-primary btn-lg">
-            <i class="bi bi-person-plus-fill"></i> Novo Paciente
-        </a>
-    </div>
-</div>
-
-<div class="row mb-4">
-    <div class="col-md-6">
-        <form method="get" class="input-group">
-            <input type="text" name="busca" class="form-control" placeholder="Buscar por nome, CPF ou telefone..." value="{{ busca }}">
-            <button class="btn btn-primary" type="submit">
-                <i class="bi bi-search"></i> Buscar
-            </button>
-            {% if busca %}
-            <a href="{% url 'dashboard' %}" class="btn btn-secondary">
-                <i class="bi bi-x-circle"></i> Limpar
+<!-- Hero Section -->
+<div class="hero-section animate-fade-in">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h1 class="display-5 fw-bold mb-2">Olá, {{ user.username|title }}!</h1>
+            <p class="lead opacity-75 mb-0">Bem-vindo ao seu painel de controle. Aqui está o resumo dos seus pacientes.
+            </p>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <a href="{% url 'paciente_criar' %}" class="btn btn-light text-primary fw-bold shadow-sm">
+                <i class="bi bi-person-plus-fill me-2"></i> Novo Paciente
             </a>
-            {% endif %}
-        </form>
+        </div>
     </div>
 </div>
 
-<div class="row">
-    {% if pacientes %}
-        {% for paciente in pacientes %}
-        <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <i class="bi bi-person-fill text-primary"></i> {{ paciente.nome_completo }}
-                    </h5>
-                    <p class="card-text">
-                        <strong><i class="bi bi-calendar-event"></i> Idade:</strong> {{ paciente.get_idade }} anos<br>
-                        <strong><i class="bi bi-telephone-fill"></i> Telefone:</strong> {{ paciente.telefone }}<br>
-                        <strong><i class="bi bi-geo-alt-fill"></i> Cidade:</strong> {{ paciente.cidade }}, {{ paciente.estado }}
-                    </p>
-                    <div class="d-grid gap-2">
-                        <a href="{% url 'paciente_detalhes' paciente.pk %}" class="btn btn-primary btn-sm">
-                            <i class="bi bi-eye-fill"></i> Ver Detalhes
-                        </a>
+<!-- Stats Row -->
+<div class="row mb-5 animate-slide-up delay-100">
+    <div class="col-md-4 mb-4 mb-md-0">
+        <div class="stats-card">
+            <div class="stats-icon">
+                <i class="bi bi-people-fill"></i>
+            </div>
+            <div>
+                <h3 class="mb-0 fw-bold">{{ pacientes.count }}</h3>
+                <p class="text-muted mb-0">Total de Pacientes</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4 mb-md-0">
+        <div class="stats-card">
+            <div class="stats-icon" style="background-color: #fff3cd; color: #ffc107;">
+                <i class="bi bi-clock-history"></i>
+            </div>
+            <div>
+                <h3 class="mb-0 fw-bold">Hoje</h3>
+                <p class="text-muted mb-0">Acessos Recentes</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stats-card">
+            <div class="stats-icon" style="background-color: #cfe2ff; color: #0d6efd;">
+                <i class="bi bi-file-earmark-text-fill"></i>
+            </div>
+            <div>
+                <h3 class="mb-0 fw-bold">Docs</h3>
+                <p class="text-muted mb-0">Documentos Gerenciados</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search & Filter -->
+<div class="row mb-4 animate-slide-up delay-200">
+    <div class="col-md-12">
+        <div class="card p-3">
+            <form method="get" class="row g-3 align-items-center">
+                <div class="col-md-10">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i
+                                class="bi bi-search text-muted"></i></span>
+                        <input type="text" name="busca" class="form-control border-start-0 ps-0"
+                            placeholder="Buscar por nome, CPF ou telefone..." value="{{ busca }}">
                     </div>
                 </div>
-                <div class="card-footer text-muted">
-                    <small><i class="bi bi-clock"></i> Cadastrado em {{ paciente.data_cadastro|date:"d/m/Y" }}</small>
+                <div class="col-md-2 d-grid">
+                    <button class="btn btn-primary" type="submit">Buscar</button>
+                </div>
+                {% if busca %}
+                <div class="col-12">
+                    <a href="{% url 'dashboard' %}" class="text-decoration-none text-muted small">
+                        <i class="bi bi-x-circle me-1"></i> Limpar filtros
+                    </a>
+                </div>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Patients Grid -->
+<div class="row animate-slide-up delay-300">
+    <div class="col-12 mb-3 d-flex justify-content-between align-items-center">
+        <h4 class="fw-bold text-primary mb-0">Seus Pacientes</h4>
+        <span class="badge bg-light text-dark border">{{ pacientes|length }} encontrados</span>
+    </div>
+
+    {% if pacientes %}
+    {% for paciente in pacientes %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100 glass-card p-0 border-0 shadow-sm hover-lift">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="btn-floating bg-light text-primary me-3 shadow-sm">
+                        {{ paciente.nome_completo|make_list|first|upper }}
+                    </div>
+                    <div style="flex:1">
+                        <h5 class="mb-0 fw-bold text-truncate">{{ paciente.nome_completo }}</h5>
+                        <small class="text-muted">Cadastrado em {{ paciente.data_cadastro|date:"d/m/Y" }}</small>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="d-flex align-items-center mb-2 text-muted small">
+                        <i class="bi bi-calendar-event me-2 text-primary"></i>
+                        <span>{{ paciente.get_idade }} anos</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2 text-muted small">
+                        <i class="bi bi-telephone me-2 text-primary"></i>
+                        <span>{{ paciente.telefone }}</span>
+                    </div>
+                    <div class="d-flex align-items-center text-muted small">
+                        <i class="bi bi-geo-alt me-2 text-primary"></i>
+                        <span class="text-truncate">{{ paciente.cidade }}, {{ paciente.estado }}</span>
+                    </div>
+                </div>
+
+                <div class="d-grid">
+                    <a href="{% url 'paciente_detalhes' paciente.pk %}"
+                        class="btn btn-outline-primary btn-sm rounded-pill">
+                        Ver Detalhes <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
                 </div>
             </div>
         </div>
-        {% endfor %}
+    </div>
+    {% endfor %}
     {% else %}
-        <div class="col-12">
-            <div class="alert alert-info text-center">
-                <i class="bi bi-info-circle-fill"></i> 
-                {% if busca %}
-                    Nenhum paciente encontrado com o termo "{{ busca }}".
-                {% else %}
-                    Você ainda não cadastrou nenhum paciente. Clique em "Novo Paciente" para começar!
-                {% endif %}
+    <div class="col-12">
+        <div class="text-center py-5 glass-card">
+            <div class="mb-3 text-muted opacity-50">
+                <i class="bi bi-search" style="font-size: 4rem;"></i>
             </div>
+            {% if busca %}
+            <h4 class="text-muted">Nenhum paciente encontrado</h4>
+            <p class="text-muted">Não encontramos resultados para "{{ busca }}".</p>
+            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary mt-2">Limpar busca</a>
+            {% else %}
+            <h4 class="text-muted">Nenhum paciente cadastrado</h4>
+            <p class="text-muted">Comece adicionando seu primeiro paciente ao sistema.</p>
+            <a href="{% url 'paciente_criar' %}" class="btn btn-primary mt-2">
+                <i class="bi bi-person-plus-fill me-2"></i> Novo Paciente
+            </a>
+            {% endif %}
         </div>
+    </div>
     {% endif %}
 </div>
 {% endblock %}

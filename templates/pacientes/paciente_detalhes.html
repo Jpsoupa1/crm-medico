@@ -1,207 +1,31 @@
 {% extends 'base.html' %}
-
 {% block title %}{{ paciente.nome_completo }} - CRM Légère{% endblock %}
-
 {% block content %}
-<div class="row mb-4">
-    <div class="col-md-8">
-        <h1><i class="bi bi-person-circle"></i> {{ paciente.nome_completo }}</h1>
-        <p class="text-muted">Cadastrado em {{ paciente.data_cadastro|date:"d/m/Y às H:i" }}</p>
-    </div>
-    <div class="col-md-4 text-end">
-        <a href="{% url 'paciente_editar' paciente.pk %}" class="btn btn-warning">
-            <i class="bi bi-pencil-fill"></i> Editar
-        </a>
-        <a href="{% url 'paciente_deletar' paciente.pk %}" class="btn btn-danger">
-            <i class="bi bi-trash-fill"></i> Excluir
-        </a>
-        <a href="{% url 'dashboard' %}" class="btn btn-secondary">
-            <i class="bi bi-arrow-left"></i> Voltar
-        </a>
-    </div>
+<div class="card border-0 shadow-sm mb-4 overflow-hidden animate-fade-in"><div class="card-body p-0"><div class="bg-primary p-4 text-white"><div class="d-flex justify-content-between align-items-start"><div class="d-flex align-items-center"><div class="btn-floating bg-white text-primary me-3 shadow-sm" style="width:64px;height:64px;font-size:1.5rem">{{ paciente.nome_completo|make_list|first|upper }}</div><div><h2 class="mb-1 fw-bold">{{ paciente.nome_completo }}</h2><p class="mb-0 opacity-75"><i class="bi bi-calendar-check me-1"></i> Cadastrado em {{ paciente.data_cadastro|date:"d/m/Y" }}</p></div></div><div class="d-flex gap-2"><a href="{% url 'dashboard' %}" class="btn btn-outline-light btn-sm"><i class="bi bi-arrow-left me-1"></i> Voltar</a><a href="{% url 'paciente_editar' paciente.pk %}" class="btn btn-light text-primary btn-sm fw-bold"><i class="bi bi-pencil-fill me-1"></i> Editar</a><a href="{% url 'paciente_deletar' paciente.pk %}" class="btn btn-danger btn-sm border-white"><i class="bi bi-trash-fill me-1"></i> Excluir</a></div></div></div></div></div>
+<div class="row animate-slide-up delay-100"><div class="col-lg-8"><div class="card mb-4"><div class="card-header bg-white border-bottom-0 pt-4 pb-0"><h5 class="fw-bold text-primary mb-0"><i class="bi bi-person-badge me-2"></i>Informações Pessoais</h5></div><div class="card-body"><div class="row g-4"><div class="col-md-6"><label class="text-muted small text-uppercase fw-bold mb-1">CPF</label><p class="fw-medium mb-0">{{paciente.cpf}}</p></div><div class="col-md-6"><label class="text-muted small text-uppercase fw-bold mb-1">Data de Nascimento</label><p class="fw-medium mb-0">{{paciente.data_nascimento|date:"d/m/Y"}} ({{paciente.get_idade}} anos)</p></div><div class="col-md-6"><label class="text-muted small text-uppercase fw-bold mb-1">Sexo</label><p class="fw-medium mb-0">{{paciente.get_sexo_display}}</p></div><div class="col-md-6"><label class="text-muted small text-uppercase fw-bold mb-1">Tipo Sanguíneo</label><p class="fw-medium mb-0">{{paciente.tipo_sanguineo|default:"Não informado"}}</p></div></div></div></div>
+<div class="card mb-4"><div class="card-header bg-white border-bottom-0 pt-4 pb-0"><h5 class="fw-bold text-primary mb-0"><i class="bi bi-heart-pulse me-2"></i>Prontuário Médico</h5></div><div class="card-body">
+{% if not paciente.alergias and not paciente.medicamentos_uso and not paciente.historico_familiar and not paciente.observacoes %}
+<div class="text-center py-4 text-muted"><i class="bi bi-clipboard-check display-6 mb-2 d-block opacity-50"></i>Nenhuma informação médica registrada.</div>
+{% else %}
+<div class="row g-4">
+{% if paciente.alergias %}<div class="col-12"><div class="p-3 bg-light rounded-3 border-start border-4 border-danger"><label class="text-danger small text-uppercase fw-bold mb-1">Alergias</label><p class="mb-0">{{paciente.alergias}}</p></div></div>{% endif %}
+{% if paciente.medicamentos_uso %}<div class="col-12"><div class="p-3 bg-light rounded-3 border-start border-4 border-warning"><label class="text-warning small text-uppercase fw-bold mb-1 text-dark">Medicamentos em Uso</label><p class="mb-0">{{paciente.medicamentos_uso}}</p></div></div>{% endif %}
+{% if paciente.historico_familiar %}<div class="col-12"><label class="text-muted small text-uppercase fw-bold mb-1">Histórico Familiar</label><p class="mb-0">{{paciente.historico_familiar}}</p></div>{% endif %}
+{% if paciente.observacoes %}<div class="col-12"><label class="text-muted small text-uppercase fw-bold mb-1">Observações Gerais</label><p class="mb-0 fst-italic">{{paciente.observacoes}}</p></div>{% endif %}
 </div>
-
-<div class="row mb-4">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header card-header-primary">
-                <h5 class="mb-0"><i class="bi bi-person-badge"></i> Informações Básicas</h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <strong><i class="bi bi-calendar-event"></i> Data de Nascimento:</strong><br>
-                        {{ paciente.data_nascimento|date:"d/m/Y" }} ({{ paciente.get_idade }} anos)
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <strong><i class="bi bi-gender-ambiguous"></i> Sexo:</strong><br>
-                        {{ paciente.get_sexo_display }}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <strong><i class="bi bi-card-text"></i> CPF:</strong><br>
-                        {{ paciente.cpf }}
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <strong><i class="bi bi-droplet-fill"></i> Tipo Sanguíneo:</strong><br>
-                        {{ paciente.tipo_sanguineo|default:"Não informado" }}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header card-header-tertiary">
-                <h5 class="mb-0"><i class="bi bi-telephone-fill"></i> Contato</h5>
-            </div>
-            <div class="card-body">
-                <p class="mb-2">
-                    <strong><i class="bi bi-telephone"></i> Telefone:</strong><br>
-                    {{ paciente.telefone }}
-                </p>
-                <p class="mb-0">
-                    <strong><i class="bi bi-envelope"></i> E-mail:</strong><br>
-                    {{ paciente.email|default:"Não informado" }}
-                </p>
-            </div>
-        </div>
-    </div>
+{% endif %}
+</div></div>
+<div class="card mb-4"><div class="card-header bg-white border-bottom-0 pt-4 pb-0 d-flex justify-content-between align-items-center"><h5 class="fw-bold text-primary mb-0"><i class="bi bi-file-earmark-pdf me-2"></i>Documentos</h5><a href="{% url 'documento_adicionar' paciente.pk %}" class="btn btn-sm btn-outline-primary rounded-pill"><i class="bi bi-plus-lg me-1"></i> Adicionar</a></div><div class="card-body">
+{% if documentos %}<div class="table-responsive"><table class="table table-hover align-middle"><tbody>
+{% for documento in documentos %}<tr><td width="40"><div class="bg-light rounded p-2 text-danger text-center"><i class="bi bi-file-pdf-fill h5 mb-0"></i></div></td><td><h6 class="mb-0 fw-bold">{{documento.titulo}}</h6><small class="text-muted">{{documento.data_upload|date:"d/m/Y"}}</small></td><td class="text-end"><a href="{{documento.arquivo.url}}" target="_blank" class="btn btn-sm btn-light text-primary me-1" title="Baixar"><i class="bi bi-download"></i></a><a href="{% url 'documento_deletar' documento.pk %}" class="btn btn-sm btn-light text-danger" title="Excluir"><i class="bi bi-trash"></i></a></td></tr>{% endfor %}
+</tbody></table></div>
+{% else %}<p class="text-muted text-center py-3 mb-0">Nenhum documento anexado.</p>{% endif %}
+</div></div></div>
+<div class="col-lg-4"><div class="card mb-4"><div class="card-header bg-white border-bottom-0 pt-4 pb-0"><h5 class="fw-bold text-primary mb-0"><i class="bi bi-telephone me-2"></i>Contato</h5></div><div class="card-body"><ul class="list-unstyled mb-0"><li class="mb-3 d-flex"><div class="me-3 text-primary"><i class="bi bi-telephone-fill"></i></div><div><label class="text-muted small text-uppercase fw-bold d-block">Telefone</label><span class="fw-medium">{{paciente.telefone}}</span></div></li><li class="mb-3 d-flex"><div class="me-3 text-primary"><i class="bi bi-envelope-fill"></i></div><div><label class="text-muted small text-uppercase fw-bold d-block">E-mail</label><span class="fw-medium">{{paciente.email|default:"Não informado"}}</span></div></li><li class="d-flex"><div class="me-3 text-primary"><i class="bi bi-geo-alt-fill"></i></div><div><label class="text-muted small text-uppercase fw-bold d-block">Endereço</label><span class="fw-medium d-block">{{paciente.endereco}}</span><span class="text-muted small">{{paciente.cidade}} - {{paciente.estado}}</span><br><span class="text-muted small">CEP: {{paciente.cep}}</span></div></li></ul></div></div>
+<div class="card mb-4"><div class="card-header bg-white border-bottom-0 pt-4 pb-0 d-flex justify-content-between align-items-center"><h5 class="fw-bold text-primary mb-0"><i class="bi bi-images me-2"></i>Galeria</h5><a href="{% url 'foto_adicionar' paciente.pk %}" class="btn btn-sm btn-outline-primary rounded-pill"><i class="bi bi-plus-lg me-1"></i></a></div><div class="card-body">
+{% if fotos %}<div class="row g-2">
+{% for foto in fotos %}<div class="col-6"><div class="position-relative group-hover-container"><img src="{{foto.imagem.url}}" class="img-fluid rounded shadow-sm w-100" style="height:120px;object-fit:cover" alt="{{foto.titulo}}"><a href="{% url 'foto_deletar' foto.pk %}" class="position-absolute top-0 end-0 m-1 btn btn-sm btn-danger py-0 px-1 opacity-75 hover-opacity-100"><i class="bi bi-x"></i></a></div><small class="d-block text-truncate mt-1 text-muted">{{foto.titulo}}</small></div>{% endfor %}
 </div>
-
-<div class="row mb-4">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header bg-success text-white">
-                <h5 class="mb-0"><i class="bi bi-geo-alt-fill"></i> Endereço</h5>
-            </div>
-            <div class="card-body">
-                <p class="mb-0">
-                    {{ paciente.endereco }}<br>
-                    {{ paciente.cidade }} - {{ paciente.estado }}<br>
-                    CEP: {{ paciente.cep }}
-                </p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row mb-4">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header bg-warning text-dark">
-                <h5 class="mb-0"><i class="bi bi-heart-pulse"></i> Informações Médicas</h5>
-            </div>
-            <div class="card-body">
-                {% if paciente.alergias %}
-                <div class="mb-3">
-                    <strong><i class="bi bi-exclamation-triangle-fill text-danger"></i> Alergias:</strong>
-                    <p class="ms-3">{{ paciente.alergias }}</p>
-                </div>
-                {% endif %}
-                
-                {% if paciente.medicamentos_uso %}
-                <div class="mb-3">
-                    <strong><i class="bi bi-capsule"></i> Medicamentos em Uso:</strong>
-                    <p class="ms-3">{{ paciente.medicamentos_uso }}</p>
-                </div>
-                {% endif %}
-                
-                {% if paciente.historico_familiar %}
-                <div class="mb-3">
-                    <strong><i class="bi bi-people-fill"></i> Histórico Familiar:</strong>
-                    <p class="ms-3">{{ paciente.historico_familiar }}</p>
-                </div>
-                {% endif %}
-                
-                {% if paciente.observacoes %}
-                <div class="mb-0">
-                    <strong><i class="bi bi-journal-text"></i> Observações:</strong>
-                    <p class="ms-3">{{ paciente.observacoes }}</p>
-                </div>
-                {% endif %}
-                
-                {% if not paciente.alergias and not paciente.medicamentos_uso and not paciente.historico_familiar and not paciente.observacoes %}
-                <p class="text-muted mb-0">Nenhuma informação médica adicional cadastrada.</p>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row mb-4">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header card-header-tertiary d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="bi bi-file-earmark-pdf-fill"></i> Documentos PDF</h5>
-                <a href="{% url 'documento_adicionar' paciente.pk %}" class="btn btn-light btn-sm text-dark">
-                    <i class="bi bi-plus-circle"></i> Adicionar PDF
-                </a>
-            </div>
-            <div class="card-body">
-                {% if documentos %}
-                <div class="list-group">
-                    {% for documento in documentos %}
-                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-1"><i class="bi bi-file-pdf"></i> {{ documento.titulo }}</h6>
-                            <p class="mb-1 text-muted small">{{ documento.descricao|default:"Sem descrição" }}</p>
-                            <small class="text-muted">Enviado em {{ documento.data_upload|date:"d/m/Y às H:i" }}</small>
-                        </div>
-                        <div>
-                            <a href="{{ documento.arquivo.url }}" target="_blank" class="btn btn-sm btn-primary me-2">
-                                <i class="bi bi-download"></i> Baixar
-                            </a>
-                            <a href="{% url 'documento_deletar' documento.pk %}" class="btn btn-sm btn-danger">
-                                <i class="bi bi-trash"></i>
-                            </a>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% else %}
-                <p class="text-muted mb-0">Nenhum documento cadastrado.</p>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row mb-4">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header card-header-primary d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="bi bi-image-fill"></i> Fotos</h5>
-                <a href="{% url 'foto_adicionar' paciente.pk %}" class="btn btn-light btn-sm text-dark">
-                    <i class="bi bi-plus-circle"></i> Adicionar Foto
-                </a>
-            </div>
-            <div class="card-body">
-                {% if fotos %}
-                <div class="row">
-                    {% for foto in fotos %}
-                    <div class="col-md-3 mb-3">
-                        <div class="card">
-                            <img src="{{ foto.imagem.url }}" class="card-img-top" alt="{{ foto.titulo }}" style="height: 200px; object-fit: cover;">
-                            <div class="card-body">
-                                <h6 class="card-title">{{ foto.titulo }}</h6>
-                                <p class="card-text small text-muted">{{ foto.descricao|default:"Sem descrição" }}</p>
-                                <small class="text-muted d-block mb-2">{{ foto.data_upload|date:"d/m/Y" }}</small>
-                                <a href="{% url 'foto_deletar' foto.pk %}" class="btn btn-sm btn-danger w-100">
-                                    <i class="bi bi-trash"></i> Remover
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% else %}
-                <p class="text-muted mb-0">Nenhuma foto cadastrada.</p>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
+{% else %}<p class="text-muted text-center py-3 mb-0">Nenhuma foto.</p>{% endif %}
+</div></div></div></div>
 {% endblock %}

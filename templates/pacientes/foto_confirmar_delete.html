@@ -1,28 +1,38 @@
 {% extends 'base.html' %}
 
-{% block title %}Confirmar Exclusão - CRM Légère{% endblock %}
+{% block title %}Excluir Foto - CRM Légère{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card border-danger">
-            <div class="card-header card-header-danger">
-                <h4 class="mb-0"><i class="bi bi-exclamation-triangle-fill"></i> Confirmar Exclusão</h4>
-            </div>
-            <div class="card-body">
-                <p>Tem certeza que deseja excluir a foto <strong>{{ foto.titulo }}</strong>?</p>
-                
-                <img src="{{ foto.imagem.url }}" class="img-fluid mb-3 rounded" alt="{{ foto.titulo }}" style="max-height: 300px; object-fit: cover;">
-                
-                <div class="alert alert-warning">
-                    <i class="bi bi-info-circle-fill"></i> Esta ação não pode ser desfeita.
+<div class="row justify-content-center animate-fade-in">
+    <div class="col-md-6 col-lg-5">
+        <div class="card border-0 shadow-lg text-center overflow-hidden">
+            <div class="card-header bg-danger text-white p-4 border-0">
+                <div class="mb-2">
+                    <i class="bi bi-image-alt" style="font-size: 3rem;"></i>
                 </div>
-                
+                <h4 class="mb-0 fw-bold">Excluir Foto</h4>
+            </div>
+            <div class="card-body p-5">
+                <h5 class="mb-3">Confirmar exclusão?</h5>
+                <p class="text-muted mb-4">
+                    Você está prestes a excluir a foto <strong>{{ foto.titulo }}</strong>.
+                    Esta ação <u>não pode ser desfeita</u>.
+                </p>
+
+                <div class="mb-4">
+                    <img src="{{ foto.imagem.url }}" class=" img-fluid rounded shadow-sm" style="max-height: 150px;"
+                        alt="Preview">
+                </div>
+
                 <form method="post">
                     {% csrf_token %}
-                    <div class="d-flex justify-content-between">
-                        <a href="{% url 'paciente_detalhes' foto.paciente.pk %}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Cancelar</a>
-                        <button type="submit" class="btn btn-danger"><i class="bi bi-trash-fill"></i> Sim, Excluir</button>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-danger fw-bold py-2 shadow-sm">
+                            <i class="bi bi-trash-fill me-2"></i> Sim, Excluir Foto
+                        </button>
+                        <a href="{% url 'paciente_detalhes' foto.paciente.pk %}" class="btn btn-light text-muted py-2">
+                            Cancelar
+                        </a>
                     </div>
                 </form>
             </div>

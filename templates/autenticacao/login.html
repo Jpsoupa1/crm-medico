@@ -1,46 +1,82 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Login - CRM Légère{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Override main container for login page to allow full screen background */
+    main.container {
+        max-width: 100%;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Ensure footer stays at bottom but doesn't interfere with full height login */
+    body {
+        overflow-x: hidden;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-md-5">
-        <div class="card">
-            <div class="card-body p-5">
-                <div class="text-center mb-4 login-header">
-                    {% load static %}
-                    <img src="{% static 'assets/img/logo_escuro.png' %}" alt="Logo Légère" style="height: 100px; margin-bottom: 10px;">
-                    <h2 class="mt-3">Acesso Légère</h2>
-                    <p class="text-muted">Faça login para acessar o sistema</p>
+<div class="login-page-bg">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5 col-lg-4">
+                <div class="login-card text-center">
+                    <div class="login-header">
+                        <img src="{% static 'img/logo_escuro.png' %}" alt="Logo Légère"
+                            style="height: 80px; margin-bottom: 1rem;">
+                        <h2>Bem-vindo</h2>
+                        <p>Acesse sua conta para continuar</p>
+                    </div>
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger shake mb-4">
+                            {% for error in form.non_field_errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <div class="form-floating mb-3">
+                            <input type="text" name="username"
+                                class="form-control {% if form.username.errors %}is-invalid{% endif %}" id="id_username"
+                                placeholder="Usuário" value="{{ form.username.value|default_if_none:'' }}" required>
+                            <label for="id_username">Usuário</label>
+                            {% if form.username.errors %}
+                            <div class="invalid-feedback text-start">
+                                {{ form.username.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-floating mb-4">
+                            <input type="password" name="password"
+                                class="form-control {% if form.password.errors %}is-invalid{% endif %}" id="id_password"
+                                placeholder="Senha" required>
+                            <label for="id_password">Senha</label>
+                            {% if form.password.errors %}
+                            <div class="invalid-feedback text-start">
+                                {{ form.password.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <button type="submit" class="btn btn-login mb-4">
+                            Entrar
+                        </button>
+
+                        <div class="text-center">
+                            <p class="mb-0 text-muted">Não tem uma conta? <a href="{% url 'registro' %}"
+                                    class="login-link">Registre-se</a></p>
+                        </div>
+                    </form>
                 </div>
-                
-                <form method="post">
-                    {% csrf_token %}
-                    
-                    <div class="mb-3">
-                        <label for="{{ form.username.id_for_label }}" class="form-label">Usuário</label>
-                        {{ form.username }}
-                        {% if form.username.errors %}
-                            <div class="text-danger mt-1">{{ form.username.errors }}</div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="{{ form.password.id_for_label }}" class="form-label">Senha</label>
-                        {{ form.password }}
-                        {% if form.password.errors %}
-                            <div class="text-danger mt-1">{{ form.password.errors }}</div>
-                        {% endif %}
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary w-100 mb-3">
-                        <i class="bi bi-box-arrow-in-right"></i> Entrar
-                    </button>
-                    
-                    <div class="text-center">
-                        <p class="mb-0">Não tem uma conta? <a href="{% url 'registro' %}">Registre-se</a></p>
-                    </div>
-                </form>
             </div>
         </div>
     </div>
